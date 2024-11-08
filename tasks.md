@@ -22,8 +22,11 @@ on the database.
 
 - Open the pets SQL. 
 - What are the entities used in this data model?
+pet, pet_owner
 - What tables are created?
+pet, pet_kind, pet_owner
 - What are the relations between the tables (one, many...)?
+
 - What kind of constrains provide these relations?
 
 ## Task 1: Insert, delete, update (Data manipulation)
@@ -49,13 +52,24 @@ Create queries to execute the following tasks.
 Save the queries to the `task2.sql`.
 
 - Show only all pets' name, age and weight only.
+select name, age, weight_in_kg from pet
 - Order the previous list by pet age, the oldest pet should be the first.
+SELECT * FROM pet
+ORDER BY -age;
 - Order the list by age (oldest first), and if the two animal have the same age show the heaviest first.
+SELECT * FROM pet
+ORDER BY -age, -weight_in_kg;
 - List 2nd, 3rd, 4th heaviest pet.
+SELECT * FROM pet
+ORDER BY -weight_in_kg
+Offset 1
+limit 4
 - Select only the pets if they are at least 5 years old and heavier than 5 kilos.
+SELECT * FROM pet
+where age >= 5 and weight_in_kg > 5
 - Get all the unique owner IDs (use the pets table only for this).
 - Find the pets who lives in the wild (does not have any owner). 
-
+select * from pet where owner_id isNULL
 
 ### Background material
 
@@ -69,8 +83,10 @@ Create queries to execute the following tasks.
 Save the queries to the `task3.sql`.
 
 - Show the pet's kind's name next to the pet.
-- Match made in heaven: Show the pet's owner's name next to the pet. Show only the pets who has an owner.
-- Wild pets among us: Show the pet's owner's name next to the pet. Show those pets too who does not have an owner (but do not show the owners who does not have pets).
+- -Match made in heaven: Show the pet's owner's name next to the pet. Show only the pets who has an owner.
+select pet_owner.name, pet.* from pet_owner join pet on pet_owner.id = pet.owner_id
+- -Wild pets among us: Show the pet's owner's name next to the pet. Show those pets too who does not have an owner (but do not show the owners who does not have pets).
+select pet_owner.name, pet.* from pet_owner right join pet on pet_owner.id = pet.owner_id
 - Free/Lonely owners: Show the pet's owner's name next to the pet. Show those owners too who does not have a pet (but do not show the pets who does not have an owner).
 - The matchmaking show: Show the pet's owner's name next to the pet. Show all the pets and owners even if they do not have owner/pet.
 
@@ -85,12 +101,27 @@ Create queries to execute the following tasks.
 Save the queries to the `task4.sql`.
 
 - Count how many pets we have.
-- Count how many pets belongs to each kind. Show a counter and the kind name next to each other.
+- -Count how many pets belongs to each kind. Show a counter and the kind name next to each other.
 - Order the previous list by count, ascending.
 - Measure the summarized weight of each kind. Show the sum of the weight and the kind's name next to each other.
 - Show only the kinds from the previous list where the summarized weight is heavier than 10 kg.
-- Find out the pet lady/lord! Find the owner who has the most pets. Show only their name, and the number of pets.
-- Find out the *cat* lady/lord! Find the owner who has the most *cats.* Show only their name, and the number of *cats*.
+- -Find out the pet lady/lord! Find the owner who has the most pets. Show only their name, and the number of pets.
+select pet_owner.name, count(pet.owner_id)
+from pet_owner
+join pet
+on pet_owner.id = pet.owner_id
+group by pet_owner.name
+order by count(pet.owner_id) desc
+limit 1
+- - Find out the *cat* lady/lord! Find the owner who has the most *cats.* Show only their name, and the number of *cats*.
+select pet_owner.name, count(pet.owner_id)
+from pet_owner
+join pet
+on pet_owner.id = pet.owner_id
+where pet.kind_id = 2
+group by pet_owner.name
+order by count(pet.owner_id) desc
+limit 1
 - Count the average age by of the pet's grouped by owner.
 
 ### Background material
