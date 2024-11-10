@@ -26,8 +26,9 @@ pet, pet_owner
 - What tables are created?
 pet, pet_kind, pet_owner
 - What are the relations between the tables (one, many...)?
-
+onetomany
 - What kind of constrains provide these relations?
+
 
 ## Task 1: Insert, delete, update (Data manipulation)
 
@@ -36,10 +37,15 @@ Create queries to execute the following tasks.
 Save the queries to the `task1.sql`.
 
 - Add yourself to the database.
+INSERT INTO pet_owner (name, age) VALUES ("Gabi", 37);
 - Add your pet or your imaginary pet to the database.
+INSERT INTO pet (name, age, weight_in_kg, kind_id, owner_id) VALUES ("Ka", 2, 3.1, 3, 11);
 - Your pet name is not respectful enough. Change it names by adding a "Mr." or "Ms." in front of it.
+UPDATE pet SET name = 'Mr Ka' WHERE id = 19;
 - Increase every pets' age if they are older than 5 years.
+UPDATE pet SET age += 5 WHERE age > 5;
 - Remove Simba from the database.
+DELETE FROM pet WHERE name = Simba;
 
 ### Background material
 
@@ -68,8 +74,9 @@ limit 4
 SELECT * FROM pet
 where age >= 5 and weight_in_kg > 5
 - Get all the unique owner IDs (use the pets table only for this).
+SELECT owner_id FROM pet WHERE owner_id IS NOT NULL GROUP BY owner_id ORDER BY owner_id;
 - Find the pets who lives in the wild (does not have any owner). 
-select * from pet where owner_id isNULL
+select * from pet where owner_id IS NULL
 
 ### Background material
 
@@ -83,12 +90,15 @@ Create queries to execute the following tasks.
 Save the queries to the `task3.sql`.
 
 - Show the pet's kind's name next to the pet.
+SELECT pet.*, pet_kind.name kind_name FROM pet JOIN pet_kind ON pet.kind_id = pet_kind.id;
 - -Match made in heaven: Show the pet's owner's name next to the pet. Show only the pets who has an owner.
 select pet_owner.name, pet.* from pet_owner join pet on pet_owner.id = pet.owner_id
 - -Wild pets among us: Show the pet's owner's name next to the pet. Show those pets too who does not have an owner (but do not show the owners who does not have pets).
 select pet_owner.name, pet.* from pet_owner right join pet on pet_owner.id = pet.owner_id
 - Free/Lonely owners: Show the pet's owner's name next to the pet. Show those owners too who does not have a pet (but do not show the pets who does not have an owner).
+SELECT pet.*, pet_owner.name owner_name FROM pet RIGHT JOIN pet_owner ON pet.owner_id = pet_owner.id;
 - The matchmaking show: Show the pet's owner's name next to the pet. Show all the pets and owners even if they do not have owner/pet.
+SELECT pet.*, pet_owner.name owner_name FROM pet FULL JOIN pet_owner ON pet.owner_id = pet_owner.id;
 
 ### Background material
 
@@ -101,10 +111,15 @@ Create queries to execute the following tasks.
 Save the queries to the `task4.sql`.
 
 - Count how many pets we have.
+SELECT COUNT(pet.id) FROM pet;
 - -Count how many pets belongs to each kind. Show a counter and the kind name next to each other.
+SELECT COUNT(pet.kind_id) kind_counter, pet_kind.name FROM pet JOIN pet_kind ON pet.kind_id = pet_kind.id GROUP BY pet_kind.name;
 - Order the previous list by count, ascending.
+SELECT COUNT(pet.kind_id) kind_counter, pet_kind.name FROM pet JOIN pet_kind ON pet.kind_id = pet_kind.id GROUP BY pet_kind.name ORDER BY COUNT(pet_kind.name) ASC;
 - Measure the summarized weight of each kind. Show the sum of the weight and the kind's name next to each other.
+SELECT SUM(pet.weight_in_kg) kind_weight, pet_kind.name FROM pet JOIN pet_kind ON pet.kind_id = pet_kind.id GROUP BY pet_kind.name;
 - Show only the kinds from the previous list where the summarized weight is heavier than 10 kg.
+SELECT SUM(pet.weight_in_kg) kind_weight, pet_kind.name FROM pet JOIN pet_kind ON pet.kind_id = pet_kind.id GROUP BY pet_kind.name HAVING SUM(pet.weight_in_kg) > 10;
 - -Find out the pet lady/lord! Find the owner who has the most pets. Show only their name, and the number of pets.
 select pet_owner.name, count(pet.owner_id)
 from pet_owner
@@ -123,6 +138,7 @@ group by pet_owner.name
 order by count(pet.owner_id) desc
 limit 1
 - Count the average age by of the pet's grouped by owner.
+SELECT ROUND(AVG(pet.age), 2) average_pet_age, pet_owner.name owner_name FROM pet JOIN pet_owner ON pet_owner.id = pet.owner_id GROUP BY pet_owner.id;
 
 ### Background material
 
